@@ -7,8 +7,8 @@ import json
 import boto3
 from botocore.exceptions import NoCredentialsError
 
+import json_builder.bin.kriya_object as kriya_object
 
-from . import kriya_object
 
 polly = boto3.client('polly')
 
