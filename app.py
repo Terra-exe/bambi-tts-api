@@ -8,7 +8,7 @@ import boto3
 import logging
 from botocore.exceptions import NoCredentialsError
 import json_builder.bin.kriya_object as kriya_object
-
+"""
 polly = boto3.client(
     'polly',
     region_name='us-west-2',
@@ -56,12 +56,17 @@ def json_to_audio(jsondata, bucket_name, s3_key):
     success = upload_to_s3(bucket_name, s3_key, audio_data)
     return success
 
+
+"""
+
+
+
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
- 
+ """
 @app.route('/bambi-tts-api', methods=['POST'])
 def handle_tts_request():
     logging.debug("Received POST request")
@@ -80,8 +85,8 @@ def handle_tts_request():
     except Exception as e:
         print("Error: ", str(e))
         return {"success": False},
-
+"""
 if __name__ == "__main__":
     print("Running App")
-    create_hello_world_audio()
+    #create_hello_world_audio()
     app.run()
