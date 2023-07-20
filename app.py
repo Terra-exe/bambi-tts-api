@@ -5,6 +5,7 @@ import sys
 import re
 import json
 import boto3
+import logging
 from botocore.exceptions import NoCredentialsError
 
 import json_builder.bin.kriya_object as kriya_object
@@ -39,10 +40,15 @@ def upload_to_s3(bucket_name, s3_key, audio_data):
         return False
 
 def create_hello_world_audio():
+    logging.debug("Creating 'Hello World' audio")
     bucket_name = 'crystal-audio-processing'
     s3_key = 'audio-dumps/audio-gen-files/hello_world.wav'
     audio_data = synthesize_speech("Hello World")
     success = upload_to_s3(bucket_name, s3_key, audio_data)
+    if success:
+        logging.debug("Successfully uploaded 'Hello World' audio to S3")
+    else:
+        logging.debug("Failed to upload 'Hello World' audio to S3")
     return success
 
 def json_to_audio(jsondata, bucket_name, s3_key):
@@ -62,6 +68,7 @@ app = Flask(__name__)
 
 @app.route('/bambi-tts-api', methods=['POST'])
 def handle_tts_request():
+    logging.debug("Received POST request")
     jsondata = {}
     print("POST received")
     try:
