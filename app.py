@@ -8,17 +8,16 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 
 
-sys.path.insert(3, r'\\SERVER\Magnum Opus\dump\audio')
-
 from . import kriya_object
 
 polly = boto3.client('polly')
+
 s3 = boto3.client(
-        's3',
-        region_name='us-west-2',
-        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
-    )
+    's3',
+    region_name='us-west-2',
+    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
+)
 
 def synthesize_speech(text, output_format='mp3', voice_id='Salli'):
     response = polly.synthesize_speech(
@@ -28,16 +27,22 @@ def synthesize_speech(text, output_format='mp3', voice_id='Salli'):
     )
     return response['AudioStream'].read()
 
-def upload_to_s3(bucket_name, audio_data, s3_key):
-    
+def upload_to_s3(bucket_name, s3_key, audio_data):
     try:
         s3.put_object(Bucket=bucket_name, Key=s3_key, Body=audio_data, ContentType='audio/mpeg')
-        return f"https://{bucket_name}.s3.amazonaws.com/{s3_key}"
+        return True
     except NoCredentialsError:
         print("No AWS credentials provided")
-        return None
+        return False
 
-def json_to_audio(jsondata, bucket_name):
+def create_hello_world_audio():
+    bucket_name = 'crystal-audio-processing'
+    s3_key = 'audio-dumps/audio-gen-files/hello_world.wav'
+    audio_data = synthesize_speech("Hello World")
+    success = upload_to_s3(bucket_name, s3_key, audio_data)
+    return success
+
+def json_to_audio(jsondata, bucket_name, s3_key):
     kriya_obj = kriya_object.create_kriya_obj_from_json(jsondata)
     filename = kriya_obj.title.replace(".json", "")
 
@@ -45,10 +50,9 @@ def json_to_audio(jsondata, bucket_name):
     audio_data = synthesize_speech(filename)
 
     # Upload the generated audio to Amazon S3
-    s3_key = f"{filename}.mp3"
-    audio_url = upload_to_s3(bucket_name, audio_data, s3_key)
+    success = upload_to_s3(bucket_name, s3_key, audio_data)
 
-    return audio_url
+    return success
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -61,10 +65,12 @@ def handle_tts_request():
         jsondata = request.get_json()  # get the JSON object from the request
         print("Received data: ", jsondata)
 
-        audio_url = json_to_audio(jsondata, 'your-s3-bucket-name')
+        bucket_name = 'crystal-audio-processing'
+        s3_key = 'audio-dumps/audio-gen-files/crystal_demo.wav'
+        success = json_to_audio(jsondata, bucket_name, s3_key)
 
-        if audio_url:
-            return jsonify({'message': 'Audio file created successfully', 'audio_url': audio_url}), 200
+        if success:
+            return jsonify({'message': 'Audio file created successfully'}), 200
         else:
             return jsonify({'message': 'Error occurred while creating audio file'}), 500
 
@@ -73,4 +79,5 @@ def handle_tts_request():
         return {"success": False},
 
 if __name__ == "__main__":
+    create_hello_world_audio()
     app.run()
