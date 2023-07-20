@@ -10,7 +10,10 @@ from botocore.exceptions import NoCredentialsError
 import json_builder.bin.kriya_object as kriya_object
 
 
-polly = boto3.client('polly')
+polly = boto3.client(
+    'polly',
+    region_name='us-west-2',  # Add this line to specify the region
+)
 
 s3 = boto3.client(
     's3',
