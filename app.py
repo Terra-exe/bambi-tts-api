@@ -89,5 +89,6 @@ def handle_tts_request():
         return {"success": False},
 
 if __name__ == "__main__":
+    print("Running App")
     create_hello_world_audio()
     app.run()
