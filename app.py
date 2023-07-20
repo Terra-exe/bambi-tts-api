@@ -4,9 +4,9 @@ import os
 import sys
 import re
 import json
-import boto3
+#import boto3
 import logging
-from botocore.exceptions import NoCredentialsError
+#from botocore.exceptions import NoCredentialsError
 import json_builder.bin.kriya_object as kriya_object
 """
 polly = boto3.client(
