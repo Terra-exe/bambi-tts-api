@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify
-import threading
-import os
-import sys
-import re
-import json
+#import threading
+#import os
+#import sys
+#import re
+#import json
 #import boto3
-import logging
+#import logging
 #from botocore.exceptions import NoCredentialsError
-import json_builder.bin.kriya_object as kriya_object
+#import json_builder.bin.kriya_object as kriya_object
 """
 polly = boto3.client(
     'polly',
